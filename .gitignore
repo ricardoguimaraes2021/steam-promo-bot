@@ -1,0 +1,5 @@
+# Ignorar arquivos sensíveis e desnecessários
+.env
+__pycache__/
+*.log
+venv/

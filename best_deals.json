@@ -1,0 +1,250 @@
+{
+    "Dead by Daylight": {
+        "name": "Dead by Daylight",
+        "discount": "-60%",
+        "original_price": "19.99€",
+        "current_price": "7.99€",
+        "link": "https://store.steampowered.com/app/381210/Dead_by_Daylight/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "NBA 2K25": {
+        "name": "NBA 2K25",
+        "discount": "-67%",
+        "original_price": "69.99€",
+        "current_price": "23.09€",
+        "link": "https://store.steampowered.com/app/2878980/NBA_2K25/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "ARK: Survival Ascended": {
+        "name": "ARK: Survival Ascended",
+        "discount": "-45%",
+        "original_price": "44.99€",
+        "current_price": "24.74€",
+        "link": "https://store.steampowered.com/app/2399830/ARK_Survival_Ascended/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Dead Space": {
+        "name": "Dead Space",
+        "discount": "-75%",
+        "original_price": "59.99€",
+        "current_price": "14.99€",
+        "link": "https://store.steampowered.com/app/1693980/Dead_Space/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Call of Duty®: Black Ops III": {
+        "name": "Call of Duty®: Black Ops III",
+        "discount": "-67%",
+        "original_price": "59.99€",
+        "current_price": "19.79€",
+        "link": "https://store.steampowered.com/app/311210/Call_of_Duty_Black_Ops_III/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Cult of the Lamb": {
+        "name": "Cult of the Lamb",
+        "discount": "-50%",
+        "original_price": "22.99€",
+        "current_price": "11.49€",
+        "link": "https://store.steampowered.com/app/1313140/Cult_of_the_Lamb/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Teardown": {
+        "name": "Teardown",
+        "discount": "-50%",
+        "original_price": "29.99€",
+        "current_price": "14.99€",
+        "link": "https://store.steampowered.com/app/1167630/Teardown/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Divinity: Original Sin 2 - Definitive Edition": {
+        "name": "Divinity: Original Sin 2 - Definitive Edition",
+        "discount": "-70%",
+        "original_price": "44.99€",
+        "current_price": "13.49€",
+        "link": "https://store.steampowered.com/app/435150/Divinity_Original_Sin_2__Definitive_Edition/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Mortal Kombat 11": {
+        "name": "Mortal Kombat 11",
+        "discount": "-90%",
+        "original_price": "49.99€",
+        "current_price": "4.99€",
+        "link": "https://store.steampowered.com/app/976310/Mortal_Kombat_11/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Dying Light 2 Stay Human: Reloaded Edition": {
+        "name": "Dying Light 2 Stay Human: Reloaded Edition",
+        "discount": "-67%",
+        "original_price": "69.99€",
+        "current_price": "23.09€",
+        "link": "https://store.steampowered.com/app/534380/Dying_Light_2_Stay_Human_Reloaded_Edition/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Dying Light 2: Stay Human Digital Extras Edition": {
+        "name": "Dying Light 2: Stay Human Digital Extras Edition",
+        "discount": "-67%",
+        "original_price": "69.99€",
+        "current_price": "23.09€",
+        "link": "https://store.steampowered.com/sub/1150220/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Left 4 Dead 2": {
+        "name": "Left 4 Dead 2",
+        "discount": "-90%",
+        "original_price": "9.75€",
+        "current_price": "0.97€",
+        "link": "https://store.steampowered.com/app/550/Left_4_Dead_2/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Call of Duty®: Modern Warfare®": {
+        "name": "Call of Duty®: Modern Warfare®",
+        "discount": "-67%",
+        "original_price": "59.99€",
+        "current_price": "19.79€",
+        "link": "https://store.steampowered.com/app/2000950/Call_of_Duty_Modern_Warfare/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Risk of Rain 2": {
+        "name": "Risk of Rain 2",
+        "discount": "-67%",
+        "original_price": "24.99€",
+        "current_price": "8.24€",
+        "link": "https://store.steampowered.com/app/632360/Risk_of_Rain_2/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Overcooked! 2": {
+        "name": "Overcooked! 2",
+        "discount": "-75%",
+        "original_price": "22.99€",
+        "current_price": "5.74€",
+        "link": "https://store.steampowered.com/app/728880/Overcooked_2/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Back 4 Blood": {
+        "name": "Back 4 Blood",
+        "discount": "-90%",
+        "original_price": "59.99€",
+        "current_price": "5.99€",
+        "link": "https://store.steampowered.com/app/924970/Back_4_Blood/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Disney Epic Mickey: Rebrushed": {
+        "name": "Disney Epic Mickey: Rebrushed",
+        "discount": "-55%",
+        "original_price": "59.99€",
+        "current_price": "26.99€",
+        "link": "https://store.steampowered.com/app/1522160/Disney_Epic_Mickey_Rebrushed/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Borderlands 3": {
+        "name": "Borderlands 3",
+        "discount": "-90%",
+        "original_price": "59.99€",
+        "current_price": "5.99€",
+        "link": "https://store.steampowered.com/app/397540/Borderlands_3/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Sackboy™: A Big Adventure": {
+        "name": "Sackboy™: A Big Adventure",
+        "discount": "-60%",
+        "original_price": "59.99€",
+        "current_price": "23.99€",
+        "link": "https://store.steampowered.com/app/1599660/Sackboy_A_Big_Adventure/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Call of Duty®: Black Ops II": {
+        "name": "Call of Duty®: Black Ops II",
+        "discount": "-67%",
+        "original_price": "59.99€",
+        "current_price": "19.79€",
+        "link": "https://store.steampowered.com/app/202970/Call_of_Duty_Black_Ops_II/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Green Hell": {
+        "name": "Green Hell",
+        "discount": "-67%",
+        "original_price": "20.99€",
+        "current_price": "6.92€",
+        "link": "https://store.steampowered.com/app/815370/Green_Hell/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Train Sim World® 5": {
+        "name": "Train Sim World® 5",
+        "discount": "-60%",
+        "original_price": "44.99€",
+        "current_price": "17.99€",
+        "link": "https://store.steampowered.com/app/2967990/Train_Sim_World_5/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Mortal Kombat 1": {
+        "name": "Mortal Kombat 1",
+        "discount": "-60%",
+        "original_price": "49.99€",
+        "current_price": "19.99€",
+        "link": "https://store.steampowered.com/app/1971870/Mortal_Kombat_1/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Deep Rock Galactic": {
+        "name": "Deep Rock Galactic",
+        "discount": "-67%",
+        "original_price": "29.99€",
+        "current_price": "9.89€",
+        "link": "https://store.steampowered.com/app/548430/Deep_Rock_Galactic/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Mafia Trilogy": {
+        "name": "Mafia Trilogy",
+        "discount": "-77%",
+        "original_price": "64.97€",
+        "current_price": "14.93€",
+        "link": "https://store.steampowered.com/bundle/48195/Mafia_Trilogy/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Portal 2": {
+        "name": "Portal 2",
+        "discount": "-90%",
+        "original_price": "9.75€",
+        "current_price": "0.97€",
+        "link": "https://store.steampowered.com/app/620/Portal_2/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Call of Duty®: Modern Warfare® III": {
+        "name": "Call of Duty®: Modern Warfare® III",
+        "discount": "-50%",
+        "original_price": "69.99€",
+        "current_price": "34.99€",
+        "link": "https://store.steampowered.com/app/2519060/Call_of_Duty_Modern_Warfare_III/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Call of Duty®: Black Ops Cold War": {
+        "name": "Call of Duty®: Black Ops Cold War",
+        "discount": "-67%",
+        "original_price": "59.99€",
+        "current_price": "19.79€",
+        "link": "https://store.steampowered.com/app/1985810/Call_of_Duty_Black_Ops_Cold_War/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "LEGO® Star Wars™: The Skywalker Saga": {
+        "name": "LEGO® Star Wars™: The Skywalker Saga",
+        "discount": "-80%",
+        "original_price": "49.99€",
+        "current_price": "9.99€",
+        "link": "https://store.steampowered.com/app/920210/LEGO_Star_Wars_The_Skywalker_Saga/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Ultimate Chicken Horse": {
+        "name": "Ultimate Chicken Horse",
+        "discount": "-65%",
+        "original_price": "12.99€",
+        "current_price": "4.54€",
+        "link": "https://store.steampowered.com/app/386940/Ultimate_Chicken_Horse/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    },
+    "Atelier Ryza 3: Alchemist of the End & the Secret Key": {
+        "name": "Atelier Ryza 3: Alchemist of the End & the Secret Key",
+        "discount": "-50%",
+        "original_price": "59.99€",
+        "current_price": "29.99€",
+        "link": "https://store.steampowered.com/app/1999770/Atelier_Ryza_3_Alchemist_of_the_End__the_Secret_Key/?snr=1_7_7_2300_150_1",
+        "date": "2025-02-11 17:00:24"
+    }
+}
