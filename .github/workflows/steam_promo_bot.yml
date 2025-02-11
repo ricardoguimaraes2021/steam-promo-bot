@@ -36,7 +36,7 @@ jobs:
           python bot.py
 
       - name: 📤 Upload Generated Files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: steam-promo-bot-files
           path: |
