@@ -209,7 +209,7 @@ async def process_best_deals():
     await send_summary_message(execution_id, len(new_deals))
 
 
-# 📢 Função para enviar o resumo final
+# 📢 Função para enviar o resumo final (evita duplicação)
 async def send_summary_message(execution_id, total_sent):
     await send_telegram_message(
         f"✅ Execution finished!\n"
