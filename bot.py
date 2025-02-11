@@ -155,83 +155,51 @@ def extract_promotions():
     logging.info(f"✅ Promotions saved successfully ({len(games)} new promotions).")
     return games
 
-# 📢 Load previously sent best deals
-def load_best_deals():
-    if os.path.exists(BEST_DEALS_FILE):
-        try:
-            with open(BEST_DEALS_FILE, "r", encoding="utf-8") as file:
-                return json.load(file)
-        except json.JSONDecodeError:
-            logging.warning("⚠️ Best deals file is corrupted. Creating a new one.")
-    return {}
-
 # 📢 Process Best Deals and send only new promotions
 async def process_best_deals():
-    history = load_history()  # Load all promotions
-    previous_best_deals = load_best_deals()  # Load previous sent promotions
+    execution_id = get_execution_id() + 1  # 🔥 Incrementa o ID da execução
+    history = load_history()  
+    previous_best_deals = load_best_deals()  
 
-    # Identify new promotions
     best_deals = {
         title: data for title, data in history.items()
         if "N/A" not in data["original_price"]
         and int(''.join(filter(str.isdigit, data["discount"]))) >= DISCOUNT_FILTER
     }
 
-    # Compare with previous best deals
     new_deals = {k: v for k, v in best_deals.items() if k not in previous_best_deals}
 
     if not new_deals:
         logging.info("❌ No new promotions found. No messages will be sent.")
         await send_telegram_message(
             f"ℹ️ No new promotions found since the last execution.\n"
-            f"📌 Execution ID: {EXECUTION_ID}\n"
+            f"📌 Execution ID: {execution_id}\n"
             f"⏳ Next automatic runtime: in 12 hours"
         )
         return
 
-    # 📌 Save the updated best deals to prevent re-sending
     with open(BEST_DEALS_FILE, "w", encoding="utf-8") as file:
         json.dump(best_deals, file, indent=4, ensure_ascii=False)
 
-    logging.info(f"✅ New Best Deals found ({len(new_deals)}). Sending messages...")
+    save_execution_id(execution_id)  # 🔥 Agora salvamos o novo ID no final
 
-    for title, deal in new_deals.items():
-        message = (
-            f"🎮 <b>{deal['name']}</b>\n"
-            f"💰 Original Price: <s>{deal['original_price']}</s>\n"
-            f"🔥 Current Price: {deal['current_price']}\n"
-            f"🛍️ Discount: {deal['discount']}\n"
-            f"🔗 <a href='{deal['link']}'>View on Steam</a>\n"
-        )
-        await send_telegram_message(message)
-        await asyncio.sleep(MESSAGE_INTERVAL)
-
-    # 📢 Final summary message
     await send_telegram_message(
         f"✅ Execution finished!\n"
-        f"📌 Execution ID: {EXECUTION_ID}\n"
+        f"📌 Execution ID: {execution_id}\n"
         f"🎮 Total new promotions sent: {len(new_deals)}\n"
         f"🕒 Last execution: {datetime.now().strftime('%d/%m/%Y - %H:%M')}\n"
         f"⏳ Next automatic runtime: in 12 hours"
     )
 
-
 # 📢 Main function
 async def check_and_send_promotions():
-    auto_mode = True  # 🔥 Always run in automatic mode
+    execution_id = get_execution_id() + 1  # 🔥 Atualiza o ID da execução no início
+    save_execution_id(execution_id)
 
-    if auto_mode:
-        logging.info("🚀 Running in automatic mode. Skipping history deletion prompt.")
-    else:
-        if input("🛑 Clear history before execution? (y/n) ").strip().lower() == "y":
-            clear_history()
-            await send_telegram_message("🗑️ Promotions history has been cleared.")
+    logging.info(f"🚀 Running execution ID: {execution_id}")
 
     extract_promotions()
     await process_best_deals()
-
-
-
 
 if __name__ == "__main__":
     asyncio.run(check_and_send_promotions())
