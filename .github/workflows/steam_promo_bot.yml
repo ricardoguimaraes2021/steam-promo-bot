@@ -34,3 +34,12 @@ jobs:
         run: |
           source venv/bin/activate
           python bot.py
+
+      - name: 📤 Upload Generated Files
+        uses: actions/upload-artifact@v3
+        with:
+          name: steam-promo-bot-files
+          path: |
+            historical_promotions.json
+            best_deals.json
+            execution_id.txt
