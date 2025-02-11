@@ -40,6 +40,6 @@ jobs:
         with:
           name: steam-promo-bot-files
           path: |
-            historical_promotions.json
-            best_deals.json
+            *.json
             execution_id.txt
+          retention-days: 7
