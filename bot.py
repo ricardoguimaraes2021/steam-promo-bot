@@ -219,6 +219,15 @@ async def send_summary_message(execution_id, total_sent):
         f"⏳ Next automatic runtime: in 12 hours"
     )
 
+# 📢 Função para enviar o resumo final
+async def send_summary_message(execution_id, total_sent):
+    await send_telegram_message(
+        f"✅ Execution finished!\n"
+        f"📌 Execution ID: {execution_id}\n"
+        f"🎮 Total new promotions sent: {total_sent}\n"
+        f"🕒 Last execution: {datetime.now().strftime('%d/%m/%Y - %H:%M')}\n"
+        f"⏳ Next automatic runtime: in 12 hours"
+    )
 
 # 📢 Main function
 async def check_and_send_promotions():
