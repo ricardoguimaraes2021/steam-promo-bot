@@ -177,7 +177,7 @@ async def process_best_deals():
         and int(''.join(filter(str.isdigit, data["discount"]))) >= DISCOUNT_FILTER
     }
 
-    # 🔥 Comparação aprimorada para evitar reenvio de promoções já enviadas
+    # 🔥 Comparação aprimorada sem data
     new_deals = {
         k: v for k, v in best_deals.items()
         if k not in previous_best_deals or previous_best_deals[k]["discount"] != v["discount"]
@@ -208,6 +208,16 @@ async def process_best_deals():
     # 📢 Enviar mensagem final com o resumo da execução
     await send_summary_message(execution_id, len(new_deals))
 
+
+# 📢 Função para enviar o resumo final
+async def send_summary_message(execution_id, total_sent):
+    await send_telegram_message(
+        f"✅ Execution finished!\n"
+        f"📌 Execution ID: {execution_id}\n"
+        f"🎮 Total new promotions sent: {total_sent}\n"
+        f"🕒 Last execution: {datetime.now().strftime('%d/%m/%Y - %H:%M')}\n"
+        f"⏳ Next automatic runtime: in 12 hours"
+    )
 
 
 # 📢 Main function
