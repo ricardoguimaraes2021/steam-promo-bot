@@ -5,7 +5,6 @@ import logging
 import json
 import re
 import signal
-import subprocess
 import time
 from datetime import datetime
 from telegram import Bot
@@ -63,19 +62,21 @@ def save_execution_id(exec_id):
 EXECUTION_ID = get_execution_id()
 save_execution_id(EXECUTION_ID)
 
-# 📢 Ask before clearing history
-def ask_clear_history():
-    choice = input("🛑 Do you want to clear the promotions history before running the bot? (y/n) ").strip().lower()
-    return choice == "y"
+# 📢 Load history to avoid resending the same promotions
+def load_history():
+    if os.path.exists(HISTORY_FILE):
+        try:
+            with open(HISTORY_FILE, "r", encoding="utf-8") as file:
+                return json.load(file)
+        except json.JSONDecodeError:
+            logging.warning("⚠️ History file is corrupted. Creating a new one.")
+    return {}
 
 # 📢 Function to clear history and best deals
 def clear_history():
-    try:
-        open(HISTORY_FILE, 'w').close()
-        open(BEST_DEALS_FILE, 'w').close()
-        logging.info("🗑️ Promotion history and best deals cleared successfully.")
-    except Exception as e:
-        logging.error(f"❌ Error clearing history: {e}")
+    open(HISTORY_FILE, 'w').close()
+    open(BEST_DEALS_FILE, 'w').close()
+    logging.info("🗑️ Promotion history and best deals cleared successfully.")
 
 # 📢 Handle Telegram flood control
 async def handle_flood_control(error_message):
@@ -111,30 +112,10 @@ async def send_telegram_message(message):
     logging.error(f"❌ Failed to send message after {max_attempts} attempts.")
     return False
 
-# 📢 Function to stop the bot manually
-def stop_bot(signum, frame):
-    """Stops the bot manually, sends a message, clears Best Deals, and runs the history cleaner."""
-    global STOPPED_MANUALLY
-    STOPPED_MANUALLY = True
-    logging.warning("🚨 Bot execution manually stopped! Clearing history and best deals...")
-
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(send_telegram_message(
-        f"🚨 <b>Bot Execution Stopped!</b>\n"
-        f"📌 Bot Execution ID: {EXECUTION_ID}\n"
-        f"🗑️ All Best Deals and Promotion History have been deleted automatically.\n"
-        f"🕒 Stopped at: {datetime.now().strftime('%d/%m/%Y - %H:%M')}"
-    ))
-
-    clear_history()
-    logging.info("✅ Bot stopped, history cleared, and best deals deleted.")
-    exit(0)
-
-# 📢 Bind SIGINT (CTRL+C) to stop function
-signal.signal(signal.SIGINT, stop_bot)
-
-# 📢 Extract promotions from Steam
+# 📢 Extract promotions from Steam and preserve history
 def extract_promotions():
+    history = load_history()
+
     response = requests.get(STEAM_PROMO_URL, headers={"User-Agent": "Mozilla/5.0"})
     if response.status_code != 200:
         logging.error(f"Error accessing Steam: {response.status_code}")
@@ -165,56 +146,79 @@ def extract_promotions():
         except Exception as e:
             logging.warning(f"Error processing item: {e}")
 
-    with open(HISTORY_FILE, "w", encoding="utf-8") as file:
-        json.dump(games, file, indent=4, ensure_ascii=False)
+    # Merge history to avoid duplicate entries
+    history.update(games)
 
-    logging.info(f"✅ Promotions saved successfully ({len(games)} promotions).")
+    with open(HISTORY_FILE, "w", encoding="utf-8") as file:
+        json.dump(history, file, indent=4, ensure_ascii=False)
+
+    logging.info(f"✅ Promotions saved successfully ({len(games)} new promotions).")
     return games
 
-# 📢 Process Best Deals
-async def process_best_deals():
-    if not os.path.exists(HISTORY_FILE):
-        logging.warning("⚠️ History file not found. No promotions processed.")
-        return {}
+# 📢 Load previously sent best deals
+def load_best_deals():
+    if os.path.exists(BEST_DEALS_FILE):
+        try:
+            with open(BEST_DEALS_FILE, "r", encoding="utf-8") as file:
+                return json.load(file)
+        except json.JSONDecodeError:
+            logging.warning("⚠️ Best deals file is corrupted. Creating a new one.")
+    return {}
 
-    with open(HISTORY_FILE, "r", encoding="utf-8") as file:
-        promotions = json.load(file)
+# 📢 Process Best Deals and send only new promotions
+async def process_best_deals():
+    history = load_history()  # Load all promotions
+    previous_best_deals = load_best_deals()  # Load previous sent promotions
 
     best_deals = {
-        title: data for title, data in promotions.items()
+        title: data for title, data in history.items()
         if "N/A" not in data["original_price"]
         and int(''.join(filter(str.isdigit, data["discount"]))) >= DISCOUNT_FILTER
     }
 
+    # Determine only new deals (not in previous_best_deals)
+    new_deals = {k: v for k, v in best_deals.items() if k not in previous_best_deals}
+
+    if not new_deals:
+        logging.info("❌ No new promotions found. No messages will be sent.")
+        await send_telegram_message(
+            f"ℹ️ No new promotions found since the last execution.\n"
+            f"📌 <b>Execution ID:</b> {EXECUTION_ID}\n"
+            f"⏳ <b>Next automatic runtime:</b> in 12 hours."
+        )
+        return
+
     with open(BEST_DEALS_FILE, "w", encoding="utf-8") as file:
         json.dump(best_deals, file, indent=4, ensure_ascii=False)
 
-    logging.info(f"✅ Best Deals saved successfully ({len(best_deals)} promotions).")
+    logging.info(f"✅ New Best Deals found ({len(new_deals)}). Sending messages...")
 
-    for title, deal in best_deals.items():
+    for title, deal in new_deals.items():
         message = (
             f"🎮 <b>{deal['name']}</b>\n"
-            f"💰 Preço Original: <s>{deal['original_price']}</s>\n"
-            f"🔥 Preço Atual: {deal['current_price']}\n"
-            f"🛍️ Desconto: {deal['discount']}\n"
-            f"🔗 <a href='{deal['link']}'>Ver na Steam</a>\n"
+            f"💰 Original Price: <s>{deal['original_price']}</s>\n"
+            f"🔥 Current Price: {deal['current_price']}\n"
+            f"🛍️ Discount: {deal['discount']}\n"
+            f"🔗 <a href='{deal['link']}'>View on Steam</a>\n"
         )
         await send_telegram_message(message)
         await asyncio.sleep(MESSAGE_INTERVAL)
 
-    # 📢 Final message with summary
+    # 📢 Final summary message
     await send_telegram_message(
         f"✅ Execution finished!\n"
-        f"📌 Bot Execution ID: {EXECUTION_ID}\n"
-        f"🎮 Total games found: {len(best_deals)}\n"
-        f"🕒 Last execution: {datetime.now().strftime('%d/%m/%Y - %H:%M')}"
+        f"📌 <b>Execution ID:</b> {EXECUTION_ID}\n"
+        f"🎮 <b>Total new promotions sent:</b> {len(new_deals)}\n"
+        f"🕒 <b>Last execution:</b> {datetime.now().strftime('%d/%m/%Y - %H:%M')}\n"
+        f"⏳ <b>Next automatic runtime:</b> in 12 hours."
     )
+
 
 # 📢 Main function
 async def check_and_send_promotions():
-    if ask_clear_history():
+    if input("🛑 Clear history before execution? (y/n) ").strip().lower() == "y":
         clear_history()
-        await send_telegram_message("🗑️ Promotions history has been cleared. The bot will start fresh.")
+        await send_telegram_message("🗑️ Promotions history has been cleared.")
 
     extract_promotions()
     await process_best_deals()
