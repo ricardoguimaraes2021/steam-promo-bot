@@ -155,6 +155,16 @@ def extract_promotions():
     logging.info(f"✅ Promotions saved successfully ({len(games)} new promotions).")
     return games
 
+# 📢 Load previously sent best deals
+def load_best_deals():
+    if os.path.exists(BEST_DEALS_FILE):
+        try:
+            with open(BEST_DEALS_FILE, "r", encoding="utf-8") as file:
+                return json.load(file)
+        except json.JSONDecodeError:
+            logging.warning("⚠️ Best deals file is corrupted. Creating a new one.")
+    return {}
+
 # 📢 Process Best Deals and send only new promotions
 async def process_best_deals():
     execution_id = get_execution_id() + 1  # 🔥 Incrementa o ID da execução
