@@ -168,8 +168,8 @@ def load_best_deals():
 # 📢 Process Best Deals and send only new promotions
 async def process_best_deals():
     execution_id = get_execution_id() + 1  # 🔥 Incrementa o ID da execução
-    history = load_history()  
-    previous_best_deals = load_best_deals()  
+    history = load_history()
+    previous_best_deals = load_best_deals()
 
     best_deals = {
         title: data for title, data in history.items()
@@ -177,7 +177,11 @@ async def process_best_deals():
         and int(''.join(filter(str.isdigit, data["discount"]))) >= DISCOUNT_FILTER
     }
 
-    new_deals = {k: v for k, v in best_deals.items() if k not in previous_best_deals}
+    # 🔥 Comparação aprimorada para evitar reenvio de promoções já enviadas
+    new_deals = {
+        k: v for k, v in best_deals.items()
+        if k not in previous_best_deals or previous_best_deals[k]["discount"] != v["discount"]
+    }
 
     if not new_deals:
         logging.info("❌ No new promotions found. No messages will be sent.")
@@ -186,6 +190,8 @@ async def process_best_deals():
 
     with open(BEST_DEALS_FILE, "w", encoding="utf-8") as file:
         json.dump(best_deals, file, indent=4, ensure_ascii=False)
+
+    save_execution_id(execution_id)  # 🔥 Agora salvamos o novo ID no final
 
     # 📢 Enviar cada nova promoção individualmente
     for title, deal in new_deals.items():
@@ -199,22 +205,8 @@ async def process_best_deals():
         await send_telegram_message(message)
         await asyncio.sleep(MESSAGE_INTERVAL)
 
-    # 📢 Salva o Execution ID **apenas no final da execução**
-    save_execution_id(execution_id)  
-
-    # 📢 Envia mensagem final com resumo
+    # 📢 Enviar mensagem final com o resumo da execução
     await send_summary_message(execution_id, len(new_deals))
-
-
-# 📢 Função para enviar o resumo final (evita duplicação)
-async def send_summary_message(execution_id, total_sent):
-    await send_telegram_message(
-        f"✅ Execution finished!\n"
-        f"📌 Execution ID: {execution_id}\n"
-        f"🎮 Total new promotions sent: {total_sent}\n"
-        f"🕒 Last execution: {datetime.now().strftime('%d/%m/%Y - %H:%M')}\n"
-        f"⏳ Next automatic runtime: in 12 hours"
-    )
 
 
 
