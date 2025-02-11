@@ -216,12 +216,20 @@ async def process_best_deals():
 
 # 📢 Main function
 async def check_and_send_promotions():
-    if input("🛑 Clear history before execution? (y/n) ").strip().lower() == "y":
-        clear_history()
-        await send_telegram_message("🗑️ Promotions history has been cleared.")
+    auto_mode = True  # 🔥 Always run in automatic mode
+
+    if auto_mode:
+        logging.info("🚀 Running in automatic mode. Skipping history deletion prompt.")
+    else:
+        if input("🛑 Clear history before execution? (y/n) ").strip().lower() == "y":
+            clear_history()
+            await send_telegram_message("🗑️ Promotions history has been cleared.")
 
     extract_promotions()
     await process_best_deals()
+
+
+
 
 if __name__ == "__main__":
     asyncio.run(check_and_send_promotions())
