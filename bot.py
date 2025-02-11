@@ -181,25 +181,42 @@ async def process_best_deals():
 
     if not new_deals:
         logging.info("❌ No new promotions found. No messages will be sent.")
-        await send_telegram_message(
-            f"ℹ️ No new promotions found since the last execution.\n"
-            f"📌 Execution ID: {execution_id}\n"
-            f"⏳ Next automatic runtime: in 12 hours"
-        )
+        await send_summary_message(execution_id, 0)  # 🔥 Usa a função para enviar resumo
         return
 
     with open(BEST_DEALS_FILE, "w", encoding="utf-8") as file:
         json.dump(best_deals, file, indent=4, ensure_ascii=False)
 
-    save_execution_id(execution_id)  # 🔥 Agora salvamos o novo ID no final
+    # 📢 Enviar cada nova promoção individualmente
+    for title, deal in new_deals.items():
+        message = (
+            f"🎮 <b>{deal['name']}</b>\n"
+            f"💰 Original Price: <s>{deal['original_price']}</s>\n"
+            f"🔥 Current Price: {deal['current_price']}\n"
+            f"🛍️ Discount: {deal['discount']}\n"
+            f"🔗 <a href='{deal['link']}'>View on Steam</a>\n"
+        )
+        await send_telegram_message(message)
+        await asyncio.sleep(MESSAGE_INTERVAL)
 
+    # 📢 Salva o Execution ID **apenas no final da execução**
+    save_execution_id(execution_id)  
+
+    # 📢 Envia mensagem final com resumo
+    await send_summary_message(execution_id, len(new_deals))
+
+
+# 📢 Função para enviar o resumo final (evita duplicação)
+async def send_summary_message(execution_id, total_sent):
     await send_telegram_message(
         f"✅ Execution finished!\n"
         f"📌 Execution ID: {execution_id}\n"
-        f"🎮 Total new promotions sent: {len(new_deals)}\n"
+        f"🎮 Total new promotions sent: {total_sent}\n"
         f"🕒 Last execution: {datetime.now().strftime('%d/%m/%Y - %H:%M')}\n"
         f"⏳ Next automatic runtime: in 12 hours"
     )
+
+
 
 # 📢 Main function
 async def check_and_send_promotions():
