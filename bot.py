@@ -14,29 +14,29 @@ from telegram.request import HTTPXRequest
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
-# 📢 Carregar variáveis do ambiente
+# 📢 Load environment variables
 load_dotenv()
 
-# 📢 CONFIGURAÇÃO DO TELEGRAM
+# 📢 TELEGRAM CONFIGURATION
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-# 📢 CONFIGURAÇÕES DO FILTRO
+# 📢 FILTER CONFIGURATION
 HISTORY_FILE = "historical_promotions.json"
 BEST_DEALS_FILE = "best_deals.json"
 EXECUTION_ID_FILE = "execution_id.txt"
-DISCOUNT_FILTER = 45  # Apenas jogos com desconto ≥ 45%
-MESSAGE_INTERVAL = 6  # Intervalo seguro entre mensagens (segundos)
-STOPPED_MANUALLY = False  # Flag para parar manualmente
+DISCOUNT_FILTER = 45  # Only games with discount ≥ 45%
+MESSAGE_INTERVAL = 6  # Safe interval between messages (seconds)
+STOPPED_MANUALLY = False  # Flag for manual stop
 
-# 📢 URL das promoções na Steam
+# 📢 STEAM PROMOTION URL
 STEAM_PROMO_URL = "https://store.steampowered.com/search/results/?query&specials=1"
 
-# 📢 Configuração do bot
+# 📢 Bot configuration
 request = HTTPXRequest()
 bot = Bot(token=TELEGRAM_BOT_TOKEN, request=request)
 
-# 📢 Configuração dos logs
+# 📢 Logging configuration
 LOG_FILE = "steam_promo_bot.log"
 
 logging.basicConfig(
@@ -48,14 +48,14 @@ logging.basicConfig(
     ]
 )
 
-# 📢 Função para obter Execution ID
+# 📢 Get Execution ID
 def get_execution_id():
     if os.path.exists(EXECUTION_ID_FILE):
         with open(EXECUTION_ID_FILE, "r") as f:
             return int(f.read().strip()) + 1
     return 1
 
-# 📢 Função para atualizar Execution ID
+# 📢 Update Execution ID
 def save_execution_id(exec_id):
     with open(EXECUTION_ID_FILE, "w") as f:
         f.write(str(exec_id))
@@ -63,12 +63,12 @@ def save_execution_id(exec_id):
 EXECUTION_ID = get_execution_id()
 save_execution_id(EXECUTION_ID)
 
-# 📢 Perguntar antes de limpar histórico
+# 📢 Ask before clearing history
 def ask_clear_history():
     choice = input("🛑 Do you want to clear the promotions history before running the bot? (y/n) ").strip().lower()
     return choice == "y"
 
-# 📢 Função para limpar histórico e best deals
+# 📢 Function to clear history and best deals
 def clear_history():
     try:
         open(HISTORY_FILE, 'w').close()
@@ -77,7 +77,7 @@ def clear_history():
     except Exception as e:
         logging.error(f"❌ Error clearing history: {e}")
 
-# 📢 Captura do tempo de espera do erro 429 (Telegram Flood Control)
+# 📢 Handle Telegram flood control
 async def handle_flood_control(error_message):
     match = re.search(r"Retry in (\d+) seconds", str(error_message))
     if match:
@@ -88,7 +88,7 @@ async def handle_flood_control(error_message):
         logging.warning("⚠️ No flood wait time specified. Waiting 30 seconds as a precaution...")
         await asyncio.sleep(30)
 
-# 📢 Envio de mensagens para o Telegram com controle de flood
+# 📢 Send messages to Telegram with flood control handling
 async def send_telegram_message(message):
     max_attempts = 3
     for attempt in range(1, max_attempts + 1):
@@ -111,7 +111,7 @@ async def send_telegram_message(message):
     logging.error(f"❌ Failed to send message after {max_attempts} attempts.")
     return False
 
-# 📢 Função para parar o bot manualmente
+# 📢 Function to stop the bot manually
 def stop_bot(signum, frame):
     """Stops the bot manually, sends a message, clears Best Deals, and runs the history cleaner."""
     global STOPPED_MANUALLY
@@ -130,10 +130,10 @@ def stop_bot(signum, frame):
     logging.info("✅ Bot stopped, history cleared, and best deals deleted.")
     exit(0)
 
-# 📢 Vincular SIGINT (CTRL+C) à função de parada
+# 📢 Bind SIGINT (CTRL+C) to stop function
 signal.signal(signal.SIGINT, stop_bot)
 
-# 📢 Captura de promoções da Steam
+# 📢 Extract promotions from Steam
 def extract_promotions():
     response = requests.get(STEAM_PROMO_URL, headers={"User-Agent": "Mozilla/5.0"})
     if response.status_code != 200:
@@ -171,7 +171,7 @@ def extract_promotions():
     logging.info(f"✅ Promotions saved successfully ({len(games)} promotions).")
     return games
 
-# 📢 Processamento das melhores promoções
+# 📢 Process Best Deals
 async def process_best_deals():
     if not os.path.exists(HISTORY_FILE):
         logging.warning("⚠️ History file not found. No promotions processed.")
@@ -202,7 +202,15 @@ async def process_best_deals():
         await send_telegram_message(message)
         await asyncio.sleep(MESSAGE_INTERVAL)
 
-# 📢 Função principal
+    # 📢 Final message with summary
+    await send_telegram_message(
+        f"✅ Execution finished!\n"
+        f"📌 Bot Execution ID: {EXECUTION_ID}\n"
+        f"🎮 Total games found: {len(best_deals)}\n"
+        f"🕒 Last execution: {datetime.now().strftime('%d/%m/%Y - %H:%M')}"
+    )
+
+# 📢 Main function
 async def check_and_send_promotions():
     if ask_clear_history():
         clear_history()
