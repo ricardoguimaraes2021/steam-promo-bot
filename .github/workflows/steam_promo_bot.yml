@@ -1,0 +1,36 @@
+name: Steam Promo Bot Auto Run
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"  # Corre a cada 12 horas
+  workflow_dispatch:  # Permite execução manual
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'
+
+      - name: 📦 Install Dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: 🔑 Setup Environment Variables
+        run: |
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> $GITHUB_ENV
+          echo "TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> $GITHUB_ENV
+          echo "AUTO_MODE=true" >> $GITHUB_ENV
+
+      - name: 🚀 Run Steam Promo Bot
+        run: |
+          source venv/bin/activate
+          python bot.py
