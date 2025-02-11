@@ -42,4 +42,5 @@ jobs:
           path: |
             *.json
             execution_id.txt
+            steam_promo_bot.log
           retention-days: 7

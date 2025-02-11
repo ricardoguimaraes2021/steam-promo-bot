@@ -170,24 +170,26 @@ async def process_best_deals():
     history = load_history()  # Load all promotions
     previous_best_deals = load_best_deals()  # Load previous sent promotions
 
+    # Identify new promotions
     best_deals = {
         title: data for title, data in history.items()
         if "N/A" not in data["original_price"]
         and int(''.join(filter(str.isdigit, data["discount"]))) >= DISCOUNT_FILTER
     }
 
-    # Determine only new deals (not in previous_best_deals)
+    # Compare with previous best deals
     new_deals = {k: v for k, v in best_deals.items() if k not in previous_best_deals}
 
     if not new_deals:
         logging.info("❌ No new promotions found. No messages will be sent.")
         await send_telegram_message(
             f"ℹ️ No new promotions found since the last execution.\n"
-            f"📌 <b>Execution ID:</b> {EXECUTION_ID}\n"
-            f"⏳ <b>Next automatic runtime:</b> in 12 hours."
+            f"📌 Execution ID: {EXECUTION_ID}\n"
+            f"⏳ Next automatic runtime: in 12 hours"
         )
         return
 
+    # 📌 Save the updated best deals to prevent re-sending
     with open(BEST_DEALS_FILE, "w", encoding="utf-8") as file:
         json.dump(best_deals, file, indent=4, ensure_ascii=False)
 
@@ -203,6 +205,16 @@ async def process_best_deals():
         )
         await send_telegram_message(message)
         await asyncio.sleep(MESSAGE_INTERVAL)
+
+    # 📢 Final summary message
+    await send_telegram_message(
+        f"✅ Execution finished!\n"
+        f"📌 Execution ID: {EXECUTION_ID}\n"
+        f"🎮 Total new promotions sent: {len(new_deals)}\n"
+        f"🕒 Last execution: {datetime.now().strftime('%d/%m/%Y - %H:%M')}\n"
+        f"⏳ Next automatic runtime: in 12 hours"
+    )
+
 
     # 📢 Final summary message
     await send_telegram_message(
