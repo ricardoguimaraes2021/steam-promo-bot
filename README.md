@@ -1,6 +1,6 @@
 # 🎮 Steam Promo Bot
 
-This bot web scrapes Steam promotions and sends the best deals to a Telegram group.
+This bot web scrapes Steam promotions and sends the best deals to a Telegram group. https://t.me/steampromos
 
 ## 📢 Features
 
