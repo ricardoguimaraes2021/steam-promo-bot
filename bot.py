@@ -50,17 +50,17 @@ logging.basicConfig(
 # 📢 Get Execution ID
 def get_execution_id():
     if os.path.exists(EXECUTION_ID_FILE):
-        with open(EXECUTION_ID_FILE, "r") as f:
-            return int(f.read().strip()) + 1
-    return 1
+        try:
+            with open(EXECUTION_ID_FILE, "r") as f:
+                return int(f.read().strip())  # Lê o ID atual do ficheiro
+        except ValueError:
+            return 1  # Se o ficheiro estiver corrompido, inicia em 1
+    return 1  # Se não existir, inicia em 1
 
-# 📢 Update Execution ID
+# 📢 Update Execution ID (Agora atualizado no final da execução)
 def save_execution_id(exec_id):
     with open(EXECUTION_ID_FILE, "w") as f:
         f.write(str(exec_id))
-
-EXECUTION_ID = get_execution_id()
-save_execution_id(EXECUTION_ID)
 
 # 📢 Load history to avoid resending the same promotions
 def load_history():
@@ -213,16 +213,6 @@ async def process_best_deals():
         f"🎮 Total new promotions sent: {len(new_deals)}\n"
         f"🕒 Last execution: {datetime.now().strftime('%d/%m/%Y - %H:%M')}\n"
         f"⏳ Next automatic runtime: in 12 hours"
-    )
-
-
-    # 📢 Final summary message
-    await send_telegram_message(
-        f"✅ Execution finished!\n"
-        f"📌 <b>Execution ID:</b> {EXECUTION_ID}\n"
-        f"🎮 <b>Total new promotions sent:</b> {len(new_deals)}\n"
-        f"🕒 <b>Last execution:</b> {datetime.now().strftime('%d/%m/%Y - %H:%M')}\n"
-        f"⏳ <b>Next automatic runtime:</b> in 12 hours."
     )
 
 
