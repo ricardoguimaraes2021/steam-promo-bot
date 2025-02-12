@@ -116,7 +116,6 @@ def extract_promotions():
         except Exception as e:
             logging.warning(f"Error processing item: {e}")
 
-    # Merge history
     history.update(games)
 
     with open(HISTORY_FILE, "w", encoding="utf-8") as file:
@@ -124,6 +123,40 @@ def extract_promotions():
 
     logging.info(f"✅ Promotions saved successfully ({len(games)} new promotions).")
     return games
+
+# 📢 Handle Telegram flood control
+async def handle_flood_control(error_message):
+    match = re.search(r"Retry in (\d+) seconds", str(error_message))
+    if match:
+        wait_time = int(match.group(1))
+        logging.warning(f"⚠️ Flood control activated! Waiting {wait_time} seconds before retrying...")
+        await asyncio.sleep(wait_time)
+    else:
+        logging.warning("⚠️ No flood wait time specified. Waiting 30 seconds as a precaution...")
+        await asyncio.sleep(30)
+
+# 📢 Send messages to Telegram with flood control handling
+async def send_telegram_message(message):
+    max_attempts = 3
+    for attempt in range(1, max_attempts + 1):
+        try:
+            await bot.send_message(
+                chat_id=TELEGRAM_CHAT_ID,
+                text=message,
+                parse_mode=ParseMode.HTML
+            )
+            logging.info(f"✅ Message successfully sent on attempt {attempt}!")
+            return True
+        except Exception as e:
+            logging.error(f"❌ Error sending message (attempt {attempt}): {e}")
+
+            if "Too Many Requests" in str(e) or "Timed out" in str(e):
+                await handle_flood_control(e)
+            else:
+                break  
+
+    logging.error(f"❌ Failed to send message after {max_attempts} attempts.")
+    return False
 
 # 📢 Process Best Deals and send only new promotions
 async def process_best_deals():
@@ -137,17 +170,15 @@ async def process_best_deals():
         and int(''.join(filter(str.isdigit, data["discount"]))) >= DISCOUNT_FILTER
     }
 
-    # 🔥 Comparação aprimorada com flag `already_sent`
     for title, deal in best_deals.items():
         if title in previous_best_deals:
             if previous_best_deals[title]["discount"] == deal["discount"]:
-                best_deals[title]["already_sent"] = True  # Se já foi enviado e desconto não mudou
+                best_deals[title]["already_sent"] = True
             else:
-                best_deals[title]["already_sent"] = False  # Se o desconto mudou, reenvia
+                best_deals[title]["already_sent"] = False
         else:
-            best_deals[title]["already_sent"] = False  # Promoção nova
+            best_deals[title]["already_sent"] = False
 
-    # 🔥 Apenas enviar promoções novas
     new_deals = {k: v for k, v in best_deals.items() if not v["already_sent"]}
 
     if not new_deals:
@@ -160,7 +191,6 @@ async def process_best_deals():
 
     save_execution_id(execution_id)
 
-    # 📢 Enviar cada nova promoção individualmente
     for title, deal in new_deals.items():
         message = (
             f"🎮 <b>{deal['name']}</b>\n"
@@ -173,16 +203,6 @@ async def process_best_deals():
         await asyncio.sleep(MESSAGE_INTERVAL)
 
     await send_summary_message(execution_id, len(new_deals))
-
-# 📢 Send summary message
-async def send_summary_message(execution_id, total_sent):
-    await send_telegram_message(
-        f"✅ Execution finished!\n"
-        f"📌 Execution ID: {execution_id}\n"
-        f"🎮 Total new promotions sent: {total_sent}\n"
-        f"🕒 Last execution: {datetime.now().strftime('%d/%m/%Y - %H:%M')}\n"
-        f"⏳ Next automatic runtime: in 12 hours"
-    )
 
 # 📢 Main function
 async def check_and_send_promotions():
