@@ -46,7 +46,7 @@ logging.basicConfig(
 )
 
 # 📢 BOT VERSION
-BOT_VERSION = "2.1"
+BOT_VERSION = "2.2"
 
 # 📢 Notify Telegram about version update
 async def send_version_notification():
@@ -106,16 +106,15 @@ def extract_promotions():
             current_price_element = item.select_one('.discount_final_price')
 
             discount_text = discount_element.text.strip() if discount_element else "0%"
-            original_price = original_price_element.text.strip().replace('€', '').replace(',', '.').replace(' ', '') if original_price_element else "N/A"
-            current_price = current_price_element.text.strip().replace('€', '').replace(',', '.').replace(' ', '') if current_price_element else "N/A"
+            original_price = original_price_element.text.strip() if original_price_element else "N/A"
+            current_price = current_price_element.text.strip() if current_price_element else "N/A"
 
             games[title] = {
                 "name": title,
                 "discount": discount_text,
-                "original_price": f"{original_price}€",
-                "current_price": f"{current_price}€",
+                "original_price": original_price,
+                "current_price": current_price,
                 "link": item["href"],
-                "already_sent": False  
             }
         except Exception as e:
             logging.warning(f"Error processing item: {e}")
@@ -147,6 +146,16 @@ async def send_telegram_message(message):
     logging.error(f"❌ Failed to send message after {max_attempts} attempts.")
     return False
 
+# 📢 Format game message
+def format_game_message(deal):
+    return (
+        f"🎮 {deal['name']}\n"
+        f"💰 Original Price: {deal['original_price']}\n"
+        f"🔥 Current Price: {deal['current_price']}\n"
+        f"🛍️ Discount: {deal['discount']}\n"
+        f"🔗 <a href='{deal['link']}'>View on Steam</a>"
+    )
+
 # 📢 Process Best Deals and send only new promotions
 async def process_best_deals():
     execution_id = get_execution_id() + 1
@@ -163,7 +172,8 @@ async def process_best_deals():
     for title, deal in best_deals.items():
         if title not in previous_best_deals:
             new_deals[title] = deal
-        elif previous_best_deals[title]["discount"] != deal["discount"]:
+        elif (previous_best_deals[title]["discount"] != deal["discount"] or
+              previous_best_deals[title]["current_price"] != deal["current_price"]):
             new_deals[title] = deal
 
     if not new_deals:
@@ -171,7 +181,7 @@ async def process_best_deals():
         return
 
     for title, deal in new_deals.items():
-        message = f"🎮 <b>{deal['name']}</b> - {deal['discount']} 🔗 <a href='{deal['link']}'>View</a>"
+        message = format_game_message(deal)
         sent = await send_telegram_message(message)
         if sent:
             previous_best_deals[title] = deal
