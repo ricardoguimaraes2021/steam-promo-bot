@@ -46,7 +46,7 @@ logging.basicConfig(
 )
 
 # 📢 BOT VERSION
-BOT_VERSION = "2.0"
+BOT_VERSION = "2.1"
 
 # 📢 Notify Telegram about version update
 async def send_version_notification():
@@ -159,24 +159,28 @@ async def process_best_deals():
         and int(''.join(filter(str.isdigit, data["discount"]))) >= DISCOUNT_FILTER
     }
 
-    new_deals = {
-        title: deal for title, deal in best_deals.items()
-        if title not in previous_best_deals or previous_best_deals[title]["discount"] != deal["discount"]
-    }
+    new_deals = {}
+    for title, deal in best_deals.items():
+        if title not in previous_best_deals:
+            new_deals[title] = deal
+        elif previous_best_deals[title]["discount"] != deal["discount"]:
+            new_deals[title] = deal
 
     if not new_deals:
         logging.info("❌ No new promotions found. No messages will be sent.")
         return
 
-    with open(BEST_DEALS_FILE, "w", encoding="utf-8") as file:
-        json.dump(best_deals, file, indent=4, ensure_ascii=False)
-
-    save_execution_id(execution_id)
-
     for title, deal in new_deals.items():
         message = f"🎮 <b>{deal['name']}</b> - {deal['discount']} 🔗 <a href='{deal['link']}'>View</a>"
-        await send_telegram_message(message)
+        sent = await send_telegram_message(message)
+        if sent:
+            previous_best_deals[title] = deal
         await asyncio.sleep(MESSAGE_INTERVAL)
+
+    with open(BEST_DEALS_FILE, "w", encoding="utf-8") as file:
+        json.dump(previous_best_deals, file, indent=4, ensure_ascii=False)
+
+    save_execution_id(execution_id)
 
 # 📢 Main function
 async def check_and_send_promotions():
